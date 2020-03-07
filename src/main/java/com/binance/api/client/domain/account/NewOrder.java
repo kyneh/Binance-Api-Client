@@ -39,6 +39,11 @@ public class NewOrder {
   private String quantity;
 
   /**
+   * Quote order quantity.
+   */
+  private String quoteOrderQty;
+
+  /**
    * Price.
    */
   private String price;
@@ -82,6 +87,21 @@ public class NewOrder {
     this.type = type;
     this.timeInForce = timeInForce;
     this.quantity = quantity;
+    this.newOrderRespType = NewOrderResponseType.RESULT;
+    this.timestamp = System.currentTimeMillis();
+    this.recvWindow = BinanceApiConstants.DEFAULT_RECEIVING_WINDOW;
+  }
+
+  public NewOrder(String symbol, OrderSide side, OrderType type, TimeInForce timeInForce, String quantity, boolean quote) {
+    this.symbol = symbol;
+    this.side = side;
+    this.type = type;
+    this.timeInForce = timeInForce;
+    if (quote) {
+      this.quoteOrderQty = quantity;
+    } else {
+      this.quantity = quantity;
+    }
     this.newOrderRespType = NewOrderResponseType.RESULT;
     this.timestamp = System.currentTimeMillis();
     this.recvWindow = BinanceApiConstants.DEFAULT_RECEIVING_WINDOW;
@@ -137,6 +157,15 @@ public class NewOrder {
 
   public NewOrder quantity(String quantity) {
     this.quantity = quantity;
+    return this;
+  }
+
+  public String getQuoteOrderQty() {
+    return quoteOrderQty;
+  }
+
+  public NewOrder quoteOrderQty(String quoteOrderQty) {
+    this.quoteOrderQty = quoteOrderQty;
     return this;
   }
 
@@ -213,12 +242,30 @@ public class NewOrder {
   }
 
   /**
+   * Places a MARKET buy order for the given <code>quantity</code>.
+   *
+   * @return a new order which is pre-configured with MARKET as the order type and BUY as the order side.
+   */
+  public static NewOrder marketBuy(String symbol, String quantity, boolean quote) {
+    return new NewOrder(symbol, OrderSide.BUY, OrderType.MARKET, null, quantity, quote);
+  }
+
+  /**
    * Places a MARKET sell order for the given <code>quantity</code>.
    *
    * @return a new order which is pre-configured with MARKET as the order type and SELL as the order side.
    */
   public static NewOrder marketSell(String symbol, String quantity) {
     return new NewOrder(symbol, OrderSide.SELL, OrderType.MARKET, null, quantity);
+  }
+
+  /**
+   * Places a MARKET sell order for the given <code>quantity</code>.
+   *
+   * @return a new order which is pre-configured with MARKET as the order type and SELL as the order side.
+   */
+  public static NewOrder marketSell(String symbol, String quantity, boolean quote) {
+    return new NewOrder(symbol, OrderSide.SELL, OrderType.MARKET, null, quantity, quote);
   }
 
   /**
