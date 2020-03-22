@@ -17,6 +17,7 @@ import com.binance.api.client.domain.account.request.OrderRequest;
 import com.binance.api.client.domain.account.request.OrderStatusRequest;
 import com.binance.api.client.domain.general.ExchangeInfo;
 import com.binance.api.client.domain.general.Asset;
+import com.binance.api.client.domain.lending.*;
 import com.binance.api.client.domain.market.AggTrade;
 import com.binance.api.client.domain.market.BookTicker;
 import com.binance.api.client.domain.market.Candlestick;
@@ -295,4 +296,24 @@ public interface BinanceApiRestClient {
    * @param listenKey listen key that identifies a data stream
    */
   void closeUserDataStream(String listenKey);
+
+  // Lending endpoints
+
+  /**
+   * Get Flexible Product List
+   *
+   * @return A list of all flexible lending products
+   */
+  List<FlexibleProduct> getFlexibleProductList();
+
+  /**
+   * Get Left Daily Purchase Quota of Flexible Product
+   */
+  LeftDailyPurchaseQuota getLeftDailyPurchaseQuota(String productId);
+
+  PurchaseFlexibleProductResponse purchaseFlexibleProduct(String productId, String amount);
+
+  LeftDailyRedemptionQuota getLeftDailyRedemptionQuota(String productId, RedemptionType type);
+
+  void redeemFlexibleProduct(String productId, String amount, RedemptionType type);
 }

@@ -19,6 +19,7 @@ import com.binance.api.client.domain.account.request.OrderRequest;
 import com.binance.api.client.domain.account.request.OrderStatusRequest;
 import com.binance.api.client.domain.general.Asset;
 import com.binance.api.client.domain.general.ExchangeInfo;
+import com.binance.api.client.domain.lending.*;
 import com.binance.api.client.domain.market.AggTrade;
 import com.binance.api.client.domain.market.BookTicker;
 import com.binance.api.client.domain.market.Candlestick;
@@ -29,6 +30,7 @@ import com.binance.api.client.domain.market.TickerStatistics;
 
 import java.util.List;
 
+import static com.binance.api.client.constant.BinanceApiConstants.DEFAULT_RECEIVING_WINDOW;
 import static com.binance.api.client.impl.BinanceApiServiceGenerator.createService;
 import static com.binance.api.client.impl.BinanceApiServiceGenerator.executeSync;
 
@@ -176,7 +178,7 @@ public class BinanceApiRestClientImpl implements BinanceApiRestClient {
 
   @Override
   public Account getAccount() {
-    return getAccount(BinanceApiConstants.DEFAULT_RECEIVING_WINDOW, System.currentTimeMillis());
+    return getAccount(DEFAULT_RECEIVING_WINDOW, System.currentTimeMillis());
   }
 
   @Override
@@ -186,32 +188,32 @@ public class BinanceApiRestClientImpl implements BinanceApiRestClient {
 
   @Override
   public List<Trade> getMyTrades(String symbol, Integer limit) {
-    return getMyTrades(symbol, limit, null, BinanceApiConstants.DEFAULT_RECEIVING_WINDOW, System.currentTimeMillis());
+    return getMyTrades(symbol, limit, null, DEFAULT_RECEIVING_WINDOW, System.currentTimeMillis());
   }
 
   @Override
   public List<Trade> getMyTrades(String symbol) {
-    return getMyTrades(symbol, null, null, BinanceApiConstants.DEFAULT_RECEIVING_WINDOW, System.currentTimeMillis());
+    return getMyTrades(symbol, null, null, DEFAULT_RECEIVING_WINDOW, System.currentTimeMillis());
   }
 
   @Override
   public WithdrawResult withdraw(String asset, String address, String amount, String name, String addressTag) {
-    return executeSync(binanceApiService.withdraw(asset, address, amount, name, addressTag, BinanceApiConstants.DEFAULT_RECEIVING_WINDOW, System.currentTimeMillis()));
+    return executeSync(binanceApiService.withdraw(asset, address, amount, name, addressTag, DEFAULT_RECEIVING_WINDOW, System.currentTimeMillis()));
   }
 
   @Override
   public DepositHistory getDepositHistory(String asset) {
-    return executeSync(binanceApiService.getDepositHistory(asset, BinanceApiConstants.DEFAULT_RECEIVING_WINDOW, System.currentTimeMillis()));
+    return executeSync(binanceApiService.getDepositHistory(asset, DEFAULT_RECEIVING_WINDOW, System.currentTimeMillis()));
   }
 
   @Override
   public WithdrawHistory getWithdrawHistory(String asset) {
-    return executeSync(binanceApiService.getWithdrawHistory(asset, BinanceApiConstants.DEFAULT_RECEIVING_WINDOW, System.currentTimeMillis()));
+    return executeSync(binanceApiService.getWithdrawHistory(asset, DEFAULT_RECEIVING_WINDOW, System.currentTimeMillis()));
   }
 
   @Override
   public DepositAddress getDepositAddress(String asset) {
-    return executeSync(binanceApiService.getDepositAddress(asset, BinanceApiConstants.DEFAULT_RECEIVING_WINDOW, System.currentTimeMillis()));
+    return executeSync(binanceApiService.getDepositAddress(asset, DEFAULT_RECEIVING_WINDOW, System.currentTimeMillis()));
   }
 
   // User stream endpoints
@@ -229,5 +231,32 @@ public class BinanceApiRestClientImpl implements BinanceApiRestClient {
   @Override
   public void closeUserDataStream(String listenKey) {
     executeSync(binanceApiService.closeAliveUserDataStream(listenKey));
+  }
+
+  // Lending endpoints
+
+  @Override
+  public List<FlexibleProduct> getFlexibleProductList() {
+    return executeSync(binanceApiService.getFlexibleProductList(DEFAULT_RECEIVING_WINDOW, System.currentTimeMillis()));
+  }
+
+  @Override
+  public LeftDailyPurchaseQuota getLeftDailyPurchaseQuota(String productId) {
+    return executeSync(binanceApiService.getLeftDailyPurchaseQuota(productId, DEFAULT_RECEIVING_WINDOW, System.currentTimeMillis()));
+  }
+
+  @Override
+  public PurchaseFlexibleProductResponse purchaseFlexibleProduct(String productId, String amount) {
+    return executeSync(binanceApiService.purchaseFlexibleProduct(productId, amount, DEFAULT_RECEIVING_WINDOW, System.currentTimeMillis()));
+  }
+
+  @Override
+  public LeftDailyRedemptionQuota getLeftDailyRedemptionQuota(String productId, RedemptionType type) {
+    return executeSync(binanceApiService.getLeftDailyRedemptionQuota(productId, type, DEFAULT_RECEIVING_WINDOW, System.currentTimeMillis()));
+  }
+
+  @Override
+  public void redeemFlexibleProduct(String productId, String amount, RedemptionType type) {
+    executeSync(binanceApiService.redeemFlexibleProduct(productId, amount, type, DEFAULT_RECEIVING_WINDOW, System.currentTimeMillis()));
   }
 }
