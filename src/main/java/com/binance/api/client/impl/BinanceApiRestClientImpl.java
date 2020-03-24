@@ -261,7 +261,7 @@ public class BinanceApiRestClientImpl implements BinanceApiRestClient {
   }
 
   @Override
-  public LendingAccount getLendingAccount(String productId, String amount, RedemptionType type) {
+  public LendingAccount getLendingAccount(String amount, RedemptionType type) {
     return executeSync(binanceApiService.getLendingAccount(DEFAULT_RECEIVING_WINDOW, System.currentTimeMillis()));
   }
 }
