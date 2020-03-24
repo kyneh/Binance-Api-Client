@@ -316,4 +316,6 @@ public interface BinanceApiRestClient {
   LeftDailyRedemptionQuota getLeftDailyRedemptionQuota(String productId, RedemptionType type);
 
   void redeemFlexibleProduct(String productId, String amount, RedemptionType type);
+
+  LendingAccount getLendingAccount(String productId, String amount, RedemptionType type);
 }

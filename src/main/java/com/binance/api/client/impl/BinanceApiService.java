@@ -213,4 +213,10 @@ public interface BinanceApiService {
             @Query("recvWindow") Long recvWindow,
             @Query("timestamp") Long timestamp);
 
+    @Headers(BinanceApiConstants.ENDPOINT_SECURITY_TYPE_SIGNED_HEADER)
+    @POST("/sapi/v1/lending/union/account")
+    Call<LendingAccount> getLendingAccount(
+            @Query("recvWindow") Long recvWindow,
+            @Query("timestamp") Long timestamp);
+
 }

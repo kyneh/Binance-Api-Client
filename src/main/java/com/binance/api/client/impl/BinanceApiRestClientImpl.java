@@ -259,4 +259,9 @@ public class BinanceApiRestClientImpl implements BinanceApiRestClient {
   public void redeemFlexibleProduct(String productId, String amount, RedemptionType type) {
     executeSync(binanceApiService.redeemFlexibleProduct(productId, amount, type, DEFAULT_RECEIVING_WINDOW, System.currentTimeMillis()));
   }
+
+  @Override
+  public LendingAccount getLendingAccount(String productId, String amount, RedemptionType type) {
+    return executeSync(binanceApiService.getLendingAccount(DEFAULT_RECEIVING_WINDOW, System.currentTimeMillis()));
+  }
 }
