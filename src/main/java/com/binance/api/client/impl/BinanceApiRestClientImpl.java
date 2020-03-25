@@ -261,6 +261,11 @@ public class BinanceApiRestClientImpl implements BinanceApiRestClient {
   }
 
   @Override
+  public List<ProductPosition> getFlexibleProductPosition(String asset) {
+    return executeSync(binanceApiService.getFlexibleProductPosition(asset, DEFAULT_RECEIVING_WINDOW, System.currentTimeMillis()));
+  }
+
+  @Override
   public LendingAccount getLendingAccount() {
     return executeSync(binanceApiService.getLendingAccount(DEFAULT_RECEIVING_WINDOW, System.currentTimeMillis()));
   }

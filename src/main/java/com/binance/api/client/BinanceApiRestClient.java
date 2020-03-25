@@ -317,5 +317,7 @@ public interface BinanceApiRestClient {
 
   void redeemFlexibleProduct(String productId, String amount, RedemptionType type);
 
+  List<ProductPosition> getFlexibleProductPosition(String asset);
+
   LendingAccount getLendingAccount();
 }
