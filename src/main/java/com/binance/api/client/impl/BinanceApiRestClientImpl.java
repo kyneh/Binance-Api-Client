@@ -1,10 +1,15 @@
 package com.binance.api.client.impl;
 
+import static com.binance.api.client.constant.BinanceApiConstants.DEFAULT_RECEIVING_WINDOW;
+import static com.binance.api.client.impl.BinanceApiServiceGenerator.createService;
+import static com.binance.api.client.impl.BinanceApiServiceGenerator.executeSync;
+
 import com.binance.api.client.BinanceApiRestClient;
 import com.binance.api.client.constant.BinanceApiConstants;
 import com.binance.api.client.domain.account.Account;
 import com.binance.api.client.domain.account.DepositAddress;
 import com.binance.api.client.domain.account.DepositHistory;
+import com.binance.api.client.domain.account.DustTransferResult;
 import com.binance.api.client.domain.account.NewOrder;
 import com.binance.api.client.domain.account.NewOrderResponse;
 import com.binance.api.client.domain.account.Order;
@@ -19,7 +24,13 @@ import com.binance.api.client.domain.account.request.OrderRequest;
 import com.binance.api.client.domain.account.request.OrderStatusRequest;
 import com.binance.api.client.domain.general.Asset;
 import com.binance.api.client.domain.general.ExchangeInfo;
-import com.binance.api.client.domain.lending.*;
+import com.binance.api.client.domain.lending.FlexibleProduct;
+import com.binance.api.client.domain.lending.LeftDailyPurchaseQuota;
+import com.binance.api.client.domain.lending.LeftDailyRedemptionQuota;
+import com.binance.api.client.domain.lending.LendingAccount;
+import com.binance.api.client.domain.lending.ProductPosition;
+import com.binance.api.client.domain.lending.PurchaseFlexibleProductResponse;
+import com.binance.api.client.domain.lending.RedemptionType;
 import com.binance.api.client.domain.market.AggTrade;
 import com.binance.api.client.domain.market.BookTicker;
 import com.binance.api.client.domain.market.Candlestick;
@@ -27,12 +38,7 @@ import com.binance.api.client.domain.market.CandlestickInterval;
 import com.binance.api.client.domain.market.OrderBook;
 import com.binance.api.client.domain.market.TickerPrice;
 import com.binance.api.client.domain.market.TickerStatistics;
-
 import java.util.List;
-
-import static com.binance.api.client.constant.BinanceApiConstants.DEFAULT_RECEIVING_WINDOW;
-import static com.binance.api.client.impl.BinanceApiServiceGenerator.createService;
-import static com.binance.api.client.impl.BinanceApiServiceGenerator.executeSync;
 
 /**
  * Implementation of Binance's REST API using Retrofit with synchronous/blocking method calls.
@@ -40,6 +46,7 @@ import static com.binance.api.client.impl.BinanceApiServiceGenerator.executeSync
 public class BinanceApiRestClientImpl implements BinanceApiRestClient {
 
   private final BinanceApiService binanceApiService;
+  private long serverTimeDifference;
 
   public BinanceApiRestClientImpl(String apiKey, String secret) {
     binanceApiService = createService(BinanceApiService.class, apiKey, secret);
@@ -178,7 +185,7 @@ public class BinanceApiRestClientImpl implements BinanceApiRestClient {
 
   @Override
   public Account getAccount() {
-    return getAccount(DEFAULT_RECEIVING_WINDOW, System.currentTimeMillis());
+    return getAccount(DEFAULT_RECEIVING_WINDOW, getSystemTimestamp());
   }
 
   @Override
@@ -188,32 +195,37 @@ public class BinanceApiRestClientImpl implements BinanceApiRestClient {
 
   @Override
   public List<Trade> getMyTrades(String symbol, Integer limit) {
-    return getMyTrades(symbol, limit, null, DEFAULT_RECEIVING_WINDOW, System.currentTimeMillis());
+    return getMyTrades(symbol, limit, null, DEFAULT_RECEIVING_WINDOW, getSystemTimestamp());
   }
 
   @Override
   public List<Trade> getMyTrades(String symbol) {
-    return getMyTrades(symbol, null, null, DEFAULT_RECEIVING_WINDOW, System.currentTimeMillis());
+    return getMyTrades(symbol, null, null, DEFAULT_RECEIVING_WINDOW, getSystemTimestamp());
   }
 
   @Override
   public WithdrawResult withdraw(String asset, String address, String amount, String name, String addressTag) {
-    return executeSync(binanceApiService.withdraw(asset, address, amount, name, addressTag, DEFAULT_RECEIVING_WINDOW, System.currentTimeMillis()));
+    return executeSync(binanceApiService.withdraw(asset, address, amount, name, addressTag, DEFAULT_RECEIVING_WINDOW, getSystemTimestamp()));
   }
 
   @Override
   public DepositHistory getDepositHistory(String asset) {
-    return executeSync(binanceApiService.getDepositHistory(asset, DEFAULT_RECEIVING_WINDOW, System.currentTimeMillis()));
+    return executeSync(binanceApiService.getDepositHistory(asset, DEFAULT_RECEIVING_WINDOW, getSystemTimestamp()));
   }
 
   @Override
   public WithdrawHistory getWithdrawHistory(String asset) {
-    return executeSync(binanceApiService.getWithdrawHistory(asset, DEFAULT_RECEIVING_WINDOW, System.currentTimeMillis()));
+    return executeSync(binanceApiService.getWithdrawHistory(asset, DEFAULT_RECEIVING_WINDOW, getSystemTimestamp()));
   }
 
   @Override
   public DepositAddress getDepositAddress(String asset) {
-    return executeSync(binanceApiService.getDepositAddress(asset, DEFAULT_RECEIVING_WINDOW, System.currentTimeMillis()));
+    return executeSync(binanceApiService.getDepositAddress(asset, DEFAULT_RECEIVING_WINDOW, getSystemTimestamp()));
+  }
+
+  @Override
+  public DustTransferResult dustTransfer(List<String> asset) {
+    return executeSync(binanceApiService.dustTransfer(asset, BinanceApiConstants.DEFAULT_RECEIVING_WINDOW, getSystemTimestamp()));
   }
 
   // User stream endpoints
@@ -268,5 +280,14 @@ public class BinanceApiRestClientImpl implements BinanceApiRestClient {
   @Override
   public LendingAccount getLendingAccount() {
     return executeSync(binanceApiService.getLendingAccount(DEFAULT_RECEIVING_WINDOW, System.currentTimeMillis()));
+  }
+
+  @Override
+  public void setServerTimeDifference(long diff) {
+    this.serverTimeDifference = diff;
+  }
+
+  private long getSystemTimestamp() {
+    return System.currentTimeMillis() + serverTimeDifference;
   }
 }
